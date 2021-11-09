@@ -5,34 +5,66 @@ import java.util.List;
 import java.util.Scanner;
 
 public class EmployeePayrollService {
-	public enum IOService{
-		CONSOLE_IO , FILE_IO , DB_IO ,REST_IO
-	}
-	public EmployeePayrollService() {
-	}
-	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
-		
-	}
-	
-	public static void main(String[] args) {
-		ArrayList<EmployeePayrollData> employeePayrollList = new ArrayList<>();
-		EmployeePayrollService employeePayrollService = new EmployeePayrollService(employeePayrollList);
-		Scanner consoleInputReader = new Scanner(System.in);
-		employeePayrollService.readEmployeePayrollData(consoleInputReader);
-		employeePayrollService.writeEmployeePayrollData(employeePayrollList);
-	}
-		
-	private void readEmployeePayrollData(Scanner consoleInputReader) {
-		System.out.println("Enter Employee ID:");
-		int id = consoleInputReader.nextInt();
-		System.out.println("Enter Employee Name:");
-		String name = consoleInputReader.next();
-		System.out.println("Enter Employee Salary:");
-		Double salary = consoleInputReader.nextDouble();
-		employeePayrollList.add(new EmployeePayrollData(id, name, salary ));
-	}
-	private void writeEmployeePayrollData(ArrayList<EmployeePayrollData> employeePayrollList) {
-		System.out.println("\n Writing Employee Payroll information to Console \n" + employeePayrollList);
-	}
-	
+	public List<EmployeePayrollData> employeePayrollList;
+
+    public enum IOService {CONSOLE_IO, FILE_IO}
+
+    public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
+        this.employeePayrollList = employeePayrollList;
+    }
+
+    public EmployeePayrollService() {
+        employeePayrollList = new ArrayList<>();
+    }
+
+    public static void main(String[] args) {
+        EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+        Scanner consoleInputReader = new Scanner(System.in);
+        employeePayrollService.printWelcomeMessage();
+        employeePayrollService.readEmployeePayrollData(consoleInputReader);
+        employeePayrollService.writeEmployeePayrollData(IOService.FILE_IO);
+    }
+
+    /* This method is implementing Welcome Message */
+    public void printWelcomeMessage() {
+        System.out.println("Welcome To The Employee Payroll Service System");
+    }
+
+    private void readEmployeePayrollData(Scanner consoleInputReader) {
+        System.out.println("Enter Employee ID : ");
+        int id = consoleInputReader.nextInt();
+        consoleInputReader.nextLine();
+        System.out.println("Enter Employee Name : ");
+        String name = consoleInputReader.nextLine();
+        System.out.println("Enter Employee Salary : ");
+        double salary = consoleInputReader.nextDouble();
+        employeePayrollList.add(new EmployeePayrollData(id, name, salary));
+    }
+
+    /* This method is implementing to write the Employee Payroll to the console */
+    public void writeEmployeePayrollData(IOService ioService) {
+        if (ioService.equals(IOService.CONSOLE_IO))
+            System.out.println("\nWriting Employee Payroll Roaster to console\n" + employeePayrollList);
+        else if (ioService.equals(IOService.FILE_IO)) {
+            new EmployeePayrollFileIOServices().writeData(employeePayrollList);
+        }
+    }
+
+    /* This method is implementing to count entries in a file */
+    public long countEntries(IOService ioService) {
+        if (ioService.equals(IOService.FILE_IO))
+            return new EmployeePayrollFileIOServices().countEntries();
+        return 0;
+    }
+    /*This method is implementing to print the lines in the file*/
+    public void printData(IOService ioService) {
+        if (ioService.equals(IOService.FILE_IO))
+            new EmployeePayrollFileIOServices().printData();
+    }
+    /* This method is reading each line of EmployeePayrollData */
+    public long readEmployeePayrollData(IOService ioService){
+        if (ioService.equals(IOService.FILE_IO))
+            this.employeePayrollList = new EmployeePayrollFileIOServices().readData();
+        return employeePayrollList.size();
+    }
 }
